@@ -4,14 +4,24 @@ import 'package:intl/intl.dart';
 void main() {
   final formatRupiah = NumberFormat('#,##0', 'id_ID');
 
-  // ============================================================
-  // RPL-12.2-204: UJI DAN JUSTIFIKASI — 3 SKENARIO (Tabel C)
-  // ============================================================
 
-  // Kategori barang koperasi (switch-case)
-  // Switch lebih rapi daripada banyak if karena langsung mencocokkan
-  // satu nilai ke beberapa case tetap tanpa mengulang "kategori ==" berkali-kali.
-  String kategori = "makanan";
+  List<String> daftarNamaBarang = ["Buku Tulis", "Pulpen", "Penghapus", "Roti"];
+  List<double> daftarHargaBarang = [3000.0, 2500.0, 1500.0, 5000.0];
+
+  print("=== DAFTAR BARANG ===");
+  for (int i = 0; i < daftarNamaBarang.length; i++) {
+    print("${i + 1}. ${daftarNamaBarang[i]} - Rp. ${formatRupiah.format(daftarHargaBarang[i])}");
+  }
+  print("\n"); 
+
+  // === DATA BARANG TRANSAKSI ===
+  String namaBarang = "Sepatu Olahraga";
+  double hargaAnggota = 90000.0;
+  double hargaUmum = 100000.0;
+  int jumlahBeli = 4;
+
+  // === KATEGORI BARANG ===
+  String kategori = "atk";
   String lokasiRak;
 
   switch (kategori) {
@@ -28,63 +38,91 @@ void main() {
       lokasiRak = "Rak lain";
   }
 
+  // Variabel bool status anggota
+  bool anggota = true;
+
+  // Menentukan harga berdasarkan status anggota (if/else)
+  double hargaSatuan;
+  String statusPembeli;
+
+  if (anggota) {
+    hargaSatuan = hargaAnggota;
+    statusPembeli = "Anggota";
+  } else {
+    hargaSatuan = hargaUmum;
+    statusPembeli = "Umum";
+  }
+
+  // Menghitung total sebelum diskon
+  double total = jumlahBeli * hargaSatuan;
+
+
+  if (total < 0) {
+    print("===========================================");
+    print("                 Damn mart                 ");
+    print("===========================================");
+    print("ERROR: Transaksi ditolak!");
+    print("Alasan: Total belanja bernilai negatif (Rp${formatRupiah.format(total)}).");
+    print("Hal ini terjadi karena ada kesalahan input (misal jumlah beli negatif).");
+    print("===========================================");
+    return; 
+  }
+
+  double persenDiskon;
+  double nominalDiskon;
+  double hargaAkhir;
+
+  if (anggota && total > 500000) {
+    persenDiskon = 15;
+  } else if (total > 200000) {
+    persenDiskon = 10;
+  } else if (total > 100000) {
+    persenDiskon = 5;
+  } else {
+    persenDiskon = 0;
+  }
+
+  nominalDiskon = total * (persenDiskon / 100);
+  hargaAkhir = total - nominalDiskon;
+
+  // Menampilkan hasil
   print("===========================================");
   print("                 Damn mart                 ");
   print("===========================================");
+  print("Nama Barang   : $namaBarang");
+  print("Kategori      : $kategori  →  $lokasiRak");
+  print("Status Pembeli: $statusPembeli");
+  print("Harga Satuan  : Rp${formatRupiah.format(hargaSatuan)}");
+  print("Jumlah Beli   : $jumlahBeli pcs");
+  print("-------------------------------------------");
+  print("Total Belanja : Rp${formatRupiah.format(total)}");
 
-  // ─── SKENARIO A: Anggota, total 250.000 ────────────────────
-  bool anggotaA   = true;
-  double hargaA   = 250000.0;  // harga satuan
-  int jumlahA     = 1;
-  double totalA   = jumlahA * hargaA;
-  double diskonA  = (totalA > 200000) ? 10 : (totalA > 100000) ? 5 : 0;
-  double nomDisA  = totalA * (diskonA / 100);
-  double akhirA   = totalA - nomDisA;
+  if (persenDiskon > 0) {
+    print("Diskon        : $persenDiskon% (Rp${formatRupiah.format(nominalDiskon)})");
+  } else {
+    print("Diskon        : Tidak ada diskon");
+  }
 
-  print("\n[A] Anggota — Total Rp${formatRupiah.format(totalA)}");
-  print("    Harga      : ${anggotaA ? 'Anggota' : 'Umum'}");
-  print("    Potongan   : ${diskonA.toInt()}% (Rp${formatRupiah.format(nomDisA)})");
-  print("    Harga Akhir: Rp${formatRupiah.format(akhirA)}");
-  print("    Kategori   : $kategori → $lokasiRak");
+  print("-------------------------------------------");
+  print("HARGA AKHIR   : Rp${formatRupiah.format(hargaAkhir)}");
+  print("===========================================\n");
 
-  // ─── SKENARIO B: Umum, total 150.000 ───────────────────────
-  bool anggotaB   = false;
-  double hargaB   = 150000.0;
-  int jumlahB     = 1;
-  double totalB   = jumlahB * hargaB;
-  double diskonB  = (totalB > 200000) ? 10 : (totalB > 100000) ? 5 : 0;
-  double nomDisB  = totalB * (diskonB / 100);
-  double akhirB   = totalB - nomDisB;
-
-  print("\n[B] Umum — Total Rp${formatRupiah.format(totalB)}");
-  print("    Harga      : ${anggotaB ? 'Anggota' : 'Umum'}");
-  print("    Potongan   : ${diskonB.toInt()}% (Rp${formatRupiah.format(nomDisB)})");
-  print("    Harga Akhir: Rp${formatRupiah.format(akhirB)}");
-  print("    Kategori   : $kategori → $lokasiRak");
-
-  // ─── SKENARIO C: Umum, total 50.000 ────────────────────────
-  bool anggotaC   = false;
-  double hargaC   = 50000.0;
-  int jumlahC     = 1;
-  double totalC   = jumlahC * hargaC;
-  double diskonC  = (totalC > 200000) ? 10 : (totalC > 100000) ? 5 : 0;
-  double nomDisC  = totalC * (diskonC / 100);
-  double akhirC   = totalC - nomDisC;
-
-  print("\n[C] Umum — Total Rp${formatRupiah.format(totalC)}");
-  print("    Harga      : ${anggotaC ? 'Anggota' : 'Umum'}");
-  print("    Potongan   : ${diskonC.toInt()}% (tidak ada diskon)");
-  print("    Harga Akhir: Rp${formatRupiah.format(akhirC)}");
-  print("    Kategori   : $kategori → $lokasiRak");
-
-  // ─── TABEL C RINGKASAN ──────────────────────────────────────
-  print("\n===========================================");
-  print("           HASIL PENGUJIAN                ");
-  print("===========================================");
-  print("Ske | Status  | Total      | Diskon | Akhir");
-  print("----+---------+------------+--------+-----------");
-  print(" A  | Anggota | Rp250.000  |   10%  | Rp${formatRupiah.format(akhirA)}");
-  print(" B  | Umum    | Rp150.000  |    5%  | Rp${formatRupiah.format(akhirB)}");
-  print(" C  | Umum    | Rp50.000   |    0%  | Rp${formatRupiah.format(akhirC)}");
-  print("===========================================");
+  // === TANTANGAN LEVEL 4: SIMULASI PENJUALAN DENGAN WHILE ===
+  // RPL-12.2-303: Justifikasi dan Unggah
+  // Jawaban:
+  // Bahaya apa yang muncul bila kondisi berhenti pada while keliru?
+  // Jika keliru (misal `while (stokBuku >= 0)` atau lupa menambahkan `stokBuku--`),
+  // maka program bisa mengalami Infinite Loop (berputar tanpa henti menyebabkan crash/hang),
+  // atau terus menjual barang meskipun stok sudah habis sehingga stok menjadi negatif (minus).
+  // 
+  // Bagaimana cara untuk memastikan koperasi tidak menjual melebihi stok?
+  // 1. Selalu gunakan operator perbandingan yang ketat, misalnya `while (stokBuku > 0)`.
+  // 2. Selalu pastikan ada variabel yang diubah nilainya (seperti `stokBuku--`) di dalam loop 
+  //    agar kondisi berhenti suatu saat akan terpenuhi.
+  int stokBuku = 3;
+  print("---Penjualan Buku Tulis ---");
+  while (stokBuku > 0) {
+    stokBuku--; // Terjual 1, stok berkurang
+    print("Terjual 1, sisa stok: $stokBuku");
+  }
 }

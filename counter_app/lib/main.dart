@@ -1,18 +1,55 @@
 
 import 'package:intl/intl.dart';
 
+// Fungsi untuk menghitung total transaksi (Tantangan Level 3/Fungsi)
+double hitungTotal(int jumlah, double harga) {
+  return jumlah * harga;
+}
+
+// Fungsi kedua untuk menghitung harga akhir setelah diskon (Tantangan Level 2/Fungsi)
+// JUSTIFIKASI:
+// Bila aturan potongan koperasi diubah (misal rumus diskon berubah),
+// cukup ubah ISI FUNGSI hitungHargaAkhir di satu tempat ini saja.
+// Semua bagian kode yang memanggil fungsi ini akan otomatis mengikuti aturan baru,
+// tanpa perlu mencari dan mengubah satu per satu di seluruh program.
+double hitungHargaAkhir(double total, double persenPotongan) {
+  return total - (total * persenPotongan / 100);
+}
+
 void main() {
   final formatRupiah = NumberFormat('#,##0', 'id_ID');
 
-
   List<String> daftarNamaBarang = ["Buku Tulis", "Pulpen", "Penghapus", "Roti"];
   List<double> daftarHargaBarang = [3000.0, 2500.0, 1500.0, 5000.0];
+  List<int> daftarStokBarang = [10, 20, 15, 3]; // Stok roti diubah ke 3 (menipis)
 
   print("=== DAFTAR BARANG ===");
   for (int i = 0; i < daftarNamaBarang.length; i++) {
-    print("${i + 1}. ${daftarNamaBarang[i]} - Rp. ${formatRupiah.format(daftarHargaBarang[i])}");
+    print("${i + 1}. ${daftarNamaBarang[i]} - Rp. ${formatRupiah.format(daftarHargaBarang[i])} (Stok: ${daftarStokBarang[i]})");
   }
   print("\n"); 
+
+  // === RPL-12.2-3S1 - HOTS-1: AKUMULASI NILAI STOK ===
+  double totalNilaiStok = 0;
+  for (int i = 0; i < daftarNamaBarang.length; i++) {
+    totalNilaiStok += daftarHargaBarang[i] * daftarStokBarang[i]; // Akumulasi (harga x stok)
+  }
+  print("=== TOTAL NILAI SELURUH STOK KOPERASI ===");
+  print("Rp${formatRupiah.format(totalNilaiStok)}");
+  print("=========================================\n");
+
+  print("=== LAPORAN STOK MENIPIS (< 5) ===");
+  bool adaBarangMenipis = false;
+  for (int i = 0; i < daftarNamaBarang.length; i++) {
+    if (daftarStokBarang[i] < 5) {
+      print("- ${daftarNamaBarang[i]} sisa stok: ${daftarStokBarang[i]}");
+      adaBarangMenipis = true;
+    }
+  }
+  if (!adaBarangMenipis) {
+    print("Semua stok barang masih aman (>= 5).");
+  }
+  print("==================================\n");
 
   // === DATA BARANG TRANSAKSI ===
   String namaBarang = "Sepatu Olahraga";
@@ -53,8 +90,8 @@ void main() {
     statusPembeli = "Umum";
   }
 
-  // Menghitung total sebelum diskon
-  double total = jumlahBeli * hargaSatuan;
+  // Menghitung total menggunakan pemanggilan fungsi hitungTotal
+  double total = hitungTotal(jumlahBeli, hargaSatuan);
 
 
   if (total < 0) {
@@ -83,7 +120,9 @@ void main() {
   }
 
   nominalDiskon = total * (persenDiskon / 100);
-  hargaAkhir = total - nominalDiskon;
+  
+  // Menghitung harga akhir menggunakan pemanggilan fungsi kedua
+  hargaAkhir = hitungHargaAkhir(total, persenDiskon);
 
   // Menampilkan hasil
   print("===========================================");
@@ -107,15 +146,13 @@ void main() {
   print("HARGA AKHIR   : Rp${formatRupiah.format(hargaAkhir)}");
   print("===========================================\n");
 
-  // === TANTANGAN LEVEL 4: SIMULASI PENJUALAN DENGAN WHILE ===
-  // RPL-12.2-303: Justifikasi dan Unggah
-  // Jawaban:
+  // soal
   // Bahaya apa yang muncul bila kondisi berhenti pada while keliru?
   // Jika keliru (misal `while (stokBuku >= 0)` atau lupa menambahkan `stokBuku--`),
   // maka program bisa mengalami Infinite Loop (berputar tanpa henti menyebabkan crash/hang),
   // atau terus menjual barang meskipun stok sudah habis sehingga stok menjadi negatif (minus).
   // 
-  // Bagaimana cara untuk memastikan koperasi tidak menjual melebihi stok?
+  // jawaban 
   // 1. Selalu gunakan operator perbandingan yang ketat, misalnya `while (stokBuku > 0)`.
   // 2. Selalu pastikan ada variabel yang diubah nilainya (seperti `stokBuku--`) di dalam loop 
   //    agar kondisi berhenti suatu saat akan terpenuhi.

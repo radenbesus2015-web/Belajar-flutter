@@ -5,6 +5,20 @@ double hitungTotal(int jumlah, double harga) {
   return jumlah * harga;
 }
 
+// Fungsi ketiga: menentukan harga berdasarkan status anggota
+// JAWABAN - Mengapa memindahkan keputusan ini ke fungsi mengurangi risiko salah?
+// Logika pemilihan harga (anggota/umum) hanya ditulis di SATU tempat (fungsi ini).
+// Jika programmer lupa menulis kondisi `if (anggota)` di suatu transaksi,
+// atau menulisnya tidak konsisten, maka harga yang diberikan bisa salah.
+// Dengan fungsi, cukup panggil hitungHarga() dan hasilnya selalu benar dan seragam.
+double hitungHarga(bool anggota, double hAnggota, double hUmum) {
+  if (anggota) {
+    return hAnggota;
+  } else {
+    return hUmum;
+  }
+}
+
 double hitungHargaAkhir(double total, double persenPotongan) {
   return total - (total * persenPotongan / 100);
 }
@@ -71,17 +85,9 @@ void main() {
   // Variabel bool status anggota
   bool anggota = true;
 
-  // Menentukan harga berdasarkan status anggota (if/else)
-  double hargaSatuan;
-  String statusPembeli;
-
-  if (anggota) {
-    hargaSatuan = hargaAnggota;
-    statusPembeli = "Anggota";
-  } else {
-    hargaSatuan = hargaUmum;
-    statusPembeli = "Umum";
-  }
+  // Menentukan harga menggunakan fungsi hitungHarga
+  double hargaSatuan = hitungHarga(anggota, hargaAnggota, hargaUmum);
+  String statusPembeli = anggota ? "Anggota" : "Umum";
 
   // Menghitung total menggunakan pemanggilan fungsi hitungTotal
   double total = hitungTotal(jumlahBeli, hargaSatuan);
@@ -147,7 +153,7 @@ void main() {
   }
 }
 
-// JAWABAN :
+// JAWABAN (Justifikasi hitungHargaAkhir):
 // Bila aturan potongan koperasi diubah (misal persen diskon berubah atau rumus baru),
 // cukup ubah baris di dalam fungsi hitungHargaAkhir di satu tempat ini saja.
 // Semua bagian program yang memanggil fungsi ini akan otomatis mengikuti perubahan,

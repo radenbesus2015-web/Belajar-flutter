@@ -1,17 +1,10 @@
 
 import 'package:intl/intl.dart';
 
-// Fungsi untuk menghitung total transaksi (Tantangan Level 3/Fungsi)
 double hitungTotal(int jumlah, double harga) {
   return jumlah * harga;
 }
 
-// Fungsi kedua untuk menghitung harga akhir setelah diskon (Tantangan Level 2/Fungsi)
-// JUSTIFIKASI:
-// Bila aturan potongan koperasi diubah (misal rumus diskon berubah),
-// cukup ubah ISI FUNGSI hitungHargaAkhir di satu tempat ini saja.
-// Semua bagian kode yang memanggil fungsi ini akan otomatis mengikuti aturan baru,
-// tanpa perlu mencari dan mengubah satu per satu di seluruh program.
 double hitungHargaAkhir(double total, double persenPotongan) {
   return total - (total * persenPotongan / 100);
 }
@@ -146,16 +139,6 @@ void main() {
   print("HARGA AKHIR   : Rp${formatRupiah.format(hargaAkhir)}");
   print("===========================================\n");
 
-  // soal
-  // Bahaya apa yang muncul bila kondisi berhenti pada while keliru?
-  // Jika keliru (misal `while (stokBuku >= 0)` atau lupa menambahkan `stokBuku--`),
-  // maka program bisa mengalami Infinite Loop (berputar tanpa henti menyebabkan crash/hang),
-  // atau terus menjual barang meskipun stok sudah habis sehingga stok menjadi negatif (minus).
-  // 
-  // jawaban 
-  // 1. Selalu gunakan operator perbandingan yang ketat, misalnya `while (stokBuku > 0)`.
-  // 2. Selalu pastikan ada variabel yang diubah nilainya (seperti `stokBuku--`) di dalam loop 
-  //    agar kondisi berhenti suatu saat akan terpenuhi.
   int stokBuku = 3;
   print("---Penjualan Buku Tulis ---");
   while (stokBuku > 0) {
@@ -163,3 +146,9 @@ void main() {
     print("Terjual 1, sisa stok: $stokBuku");
   }
 }
+
+// JAWABAN :
+// Bila aturan potongan koperasi diubah (misal persen diskon berubah atau rumus baru),
+// cukup ubah baris di dalam fungsi hitungHargaAkhir di satu tempat ini saja.
+// Semua bagian program yang memanggil fungsi ini akan otomatis mengikuti perubahan,
+// tanpa perlu mencari dan mengubah kode satu per satu di seluruh program.

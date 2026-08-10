@@ -50,10 +50,18 @@ void main() {
   Barang barang2 = Barang("Pulpen", 2500.0, 20);
   Barang barang3 = Barang("Roti", 5000.0, 3);
 
-  barang1.tampilkan();
-  barang2.tampilkan();
-  barang3.tampilkan();
+  List<Barang> daftarBarang = [barang1, barang2, barang3];
+
+  for (Barang barang in daftarBarang) {
+    barang.tampilkan();
+  }
   print("\n");
+
+  // JAWABAN: Apa yang lebih baik dibanding cara Sprint 3?
+  // Dengan menggunakan list bisa lebih rapi daripada membuat 3 list terpisah 
+  // (list nama, list harga, list stok). Karena datanya sekarang dibungkus dalam satu objek utuh,
+  // data tidak akan lagi tertukar atau tidak sesuai urutannya meskipun 
+  // ada ratusan atau beribu-ribu barang baru yang ditambahkan, dihapus, atau diurutkan ulang.
 
   List<String> daftarNamaBarang = ["Buku Tulis", "Pulpen", "Penghapus", "Roti"];
   List<double> daftarHargaBarang = [3000.0, 2500.0, 1500.0, 5000.0];

@@ -44,14 +44,16 @@ double bayarAkhir(int jumlah, double harga, double persenPotongan) {
 
 void main() {
   final formatRupiah = NumberFormat('#,##0', 'id_ID');
+  // Buat semua objek Barang sekaligus dalam List
+  List<Barang> daftarBarang = [
+    Barang("Buku Tulis", 3000.0, 10),
+    Barang("Pulpen", 2500.0, 20),
+    Barang("Roti", 5000.0, 3),
+    Barang("Penghapus", 1500.0, 15),
+  ];
 
-  print("=== KARTU BARANG (OBJECT) ===");
-  Barang barang1 = Barang("Buku Tulis", 3000.0, 10);
-  Barang barang2 = Barang("Pulpen", 2500.0, 20);
-  Barang barang3 = Barang("Roti", 5000.0, 3);
-
-  List<Barang> daftarBarang = [barang1, barang2, barang3];
-
+  // === DAFTAR BARANG ===
+  print("=== DAFTAR BARANG ===");
   for (Barang barang in daftarBarang) {
     barang.tampilkan();
   }
@@ -63,20 +65,10 @@ void main() {
   // data tidak akan lagi tertukar atau tidak sesuai urutannya meskipun 
   // ada ratusan atau beribu-ribu barang baru yang ditambahkan, dihapus, atau diurutkan ulang.
 
-  List<String> daftarNamaBarang = ["Buku Tulis", "Pulpen", "Penghapus", "Roti"];
-  List<double> daftarHargaBarang = [3000.0, 2500.0, 1500.0, 5000.0];
-  List<int> daftarStokBarang = [10, 20, 15, 3]; // Stok roti diubah ke 3 (menipis)
-
-  print("=== DAFTAR BARANG ===");
-  for (int i = 0; i < daftarNamaBarang.length; i++) {
-    print("${i + 1}. ${daftarNamaBarang[i]} - Rp. ${formatRupiah.format(daftarHargaBarang[i])} (Stok: ${daftarStokBarang[i]})");
-  }
-  print("\n"); 
-
   // === RPL-12.2-3S1 - HOTS-1: AKUMULASI NILAI STOK ===
   double totalNilaiStok = 0;
-  for (int i = 0; i < daftarNamaBarang.length; i++) {
-    totalNilaiStok += daftarHargaBarang[i] * daftarStokBarang[i]; // Akumulasi (harga x stok)
+  for (Barang b in daftarBarang) {
+    totalNilaiStok += b.harga * b.stok; // Akumulasi (harga x stok)
   }
   print("=== TOTAL NILAI SELURUH STOK KOPERASI ===");
   print("Rp${formatRupiah.format(totalNilaiStok)}");
@@ -84,9 +76,9 @@ void main() {
 
   print("=== LAPORAN STOK MENIPIS (< 5) ===");
   bool adaBarangMenipis = false;
-  for (int i = 0; i < daftarNamaBarang.length; i++) {
-    if (daftarStokBarang[i] < 5) {
-      print("- ${daftarNamaBarang[i]} sisa stok: ${daftarStokBarang[i]}");
+  for (Barang b in daftarBarang) {
+    if (b.stok < 5) {
+      print("- ${b.nama} sisa stok: ${b.stok}");
       adaBarangMenipis = true;
     }
   }
@@ -94,6 +86,15 @@ void main() {
     print("Semua stok barang masih aman (>= 5).");
   }
   print("==================================\n");
+
+  // === jawaban (LKPD-5) ===
+  // Apa keuntungan memodelkan barang sebagai objek bagi pengembangan sistem koperasi ke depan?
+  // 1. mudah saat ingin di kembangkan lagi karena kita hanya perlu nambah atribut baru saja
+  //    tidak perlu mengubah semuanya secara manual, misal jika koperasi ingin menambah data baru 
+  //    seperti tanggal kadaluarsa.
+  // 2. data tidak mudah tertukar pada bagian urutanya lagi karena sudah menjadi 1 object.
+  // 3. bisa digunakan ulang (reusable) yang mana itu memudahkan kita sebagai programmer 
+  //    karena tidak perlu menulis ulang strukturnya lagi.
 
   // === DATA BARANG TRANSAKSI ===
   String namaBarang = "Sepatu Olahraga";

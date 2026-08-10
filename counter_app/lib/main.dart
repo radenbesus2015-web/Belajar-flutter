@@ -1,16 +1,29 @@
 
 import 'package:intl/intl.dart';
 
+class Barang {
+  String nama;
+  double harga;
+  int stok;
+
+  // Konstruktor
+  Barang(this.nama, this.harga, this.stok);
+
+  // Method tampilkan
+  void tampilkan() {
+    final formatRupiah = NumberFormat('#,##0', 'id_ID');
+    print("-------------------------");
+    print("Nama Barang : $nama");
+    print("Harga       : Rp${formatRupiah.format(harga)}");
+    print("Stok        : $stok");
+    print("-------------------------");
+  }
+}
+
 double hitungTotal(int jumlah, double harga) {
   return jumlah * harga;
 }
 
-// Fungsi ketiga: menentukan harga berdasarkan status anggota
-// JAWABAN - Mengapa memindahkan keputusan ini ke fungsi mengurangi risiko salah?
-// Logika pemilihan harga (anggota/umum) hanya ditulis di SATU tempat (fungsi ini).
-// Jika programmer lupa menulis kondisi `if (anggota)` di suatu transaksi,
-// atau menulisnya tidak konsisten, maka harga yang diberikan bisa salah.
-// Dengan fungsi, cukup panggil hitungHarga() dan hasilnya selalu benar dan seragam.
 double hitungHarga(bool anggota, double hAnggota, double hUmum) {
   if (anggota) {
     return hAnggota;
@@ -23,8 +36,24 @@ double hitungHargaAkhir(double total, double persenPotongan) {
   return total - (total * persenPotongan / 100);
 }
 
+
+double bayarAkhir(int jumlah, double harga, double persenPotongan) {
+  double total = hitungTotal(jumlah, harga);
+  return hitungHargaAkhir(total, persenPotongan);
+}
+
 void main() {
   final formatRupiah = NumberFormat('#,##0', 'id_ID');
+
+  print("=== KARTU BARANG (OBJECT) ===");
+  Barang barang1 = Barang("Buku Tulis", 3000.0, 10);
+  Barang barang2 = Barang("Pulpen", 2500.0, 20);
+  Barang barang3 = Barang("Roti", 5000.0, 3);
+
+  barang1.tampilkan();
+  barang2.tampilkan();
+  barang3.tampilkan();
+  print("\n");
 
   List<String> daftarNamaBarang = ["Buku Tulis", "Pulpen", "Penghapus", "Roti"];
   List<double> daftarHargaBarang = [3000.0, 2500.0, 1500.0, 5000.0];
@@ -120,8 +149,8 @@ void main() {
 
   nominalDiskon = total * (persenDiskon / 100);
   
-  // Menghitung harga akhir menggunakan pemanggilan fungsi kedua
-  hargaAkhir = hitungHargaAkhir(total, persenDiskon);
+  // Menghitung harga akhir menggunakan pemanggilan fungsi komposisi
+  hargaAkhir = bayarAkhir(jumlahBeli, hargaSatuan, persenDiskon);
 
   // Menampilkan hasil
   print("===========================================");
@@ -153,8 +182,14 @@ void main() {
   }
 }
 
-// JAWABAN (Justifikasi hitungHargaAkhir):
+// JAWABAN :
 // Bila aturan potongan koperasi diubah (misal persen diskon berubah atau rumus baru),
 // cukup ubah baris di dalam fungsi hitungHargaAkhir di satu tempat ini saja.
 // Semua bagian program yang memanggil fungsi ini akan otomatis mengikuti perubahan,
 // tanpa perlu mencari dan mengubah kode satu per satu di seluruh program.
+
+// Host 1 JAWABAN - Mengapa memindahkan keputusan ini ke fungsi mengurangi risiko salah?
+// Logika pemilihan harga (anggota/umum) hanya ditulis di SATU tempat (fungsi ini).
+// Jika programmer lupa menulis kondisi `if (anggota)` di suatu transaksi,
+// atau menulisnya tidak konsisten, maka harga yang diberikan bisa salah.
+// Dengan fungsi, cukup panggil hitungHarga() dan hasilnya selalu benar dan seragam.

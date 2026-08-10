@@ -30,6 +30,19 @@ class Barang {
   }
 }
 
+class Pembeli {
+  String nama;
+  bool statusAnggota; // true jika anggota koperasi, false jika umum
+
+  Pembeli(this.nama, this.statusAnggota);
+}
+
+// === JAWABAN (Tantangan Level 3) ===
+// Relasi apa yang wajar antara Pembeli & Barang dalam satu transaksi?
+// Dalam SATU transaksi, relasi yang wajar adalah "Satu ke Banyak" (One-to-Many).
+// Artinya: 1 orang Pembeli bisa membeli banyak macam Barang sekaligus dalam satu keranjang belanja.
+// Tetapi di dalam struk transaksi tersebut, kumpulan Barang itu hanya dimiliki oleh 1 Pembeli saja.
+
 double hitungTotal(int jumlah, double harga) {
   return jumlah * harga;
 }

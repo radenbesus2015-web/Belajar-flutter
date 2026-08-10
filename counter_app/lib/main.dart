@@ -18,6 +18,16 @@ class Barang {
     print("Stok        : $stok");
     print("-------------------------");
   }
+
+  // Method nilaiStok
+  double nilaiStok() {
+    return harga * stok;
+  }
+
+  // Method bisaDijual 
+  bool bisaDijual(int diminta) {
+    return stok >= diminta;
+  }
 }
 
 double hitungTotal(int jumlah, double harga) {
@@ -68,8 +78,14 @@ void main() {
   // === RPL-12.2-3S1 - HOTS-1: AKUMULASI NILAI STOK ===
   double totalNilaiStok = 0;
   for (Barang b in daftarBarang) {
-    totalNilaiStok += b.harga * b.stok; // Akumulasi (harga x stok)
+    totalNilaiStok += b.nilaiStok(); // Akumulasi memanggil method nilaiStok()
   }
+  
+  // JAWABAN (HOTS-1): Untuk apa angka total nilai stok berguna bagi laporan aset koperasi?
+  // Angka ini berguna untuk menunjukkan total harta mati yang sedang tersimpan di koperasi 
+  // berupa fisik barang. Informasi seperti ini sangat krusial untuk laporan keuangan agar 
+  // pengurusnya tahu berapa banyak modal uang yang sedang tertahan dalam bentuk stok barang 
+  // yang belum berhasil terjual.
   print("=== TOTAL NILAI SELURUH STOK KOPERASI ===");
   print("Rp${formatRupiah.format(totalNilaiStok)}");
   print("=========================================\n");
@@ -95,6 +111,13 @@ void main() {
   // 2. data tidak mudah tertukar pada bagian urutanya lagi karena sudah menjadi 1 object.
   // 3. bisa digunakan ulang (reusable) yang mana itu memudahkan kita sebagai programmer 
   //    karena tidak perlu menulis ulang strukturnya lagi.
+
+  // === JAWABAN (Tantangan Level 2) ===
+  // Mengapa menaruh pengecekan (bisaDijual) di dalam objek Barang lebih baik?
+  // Karena pengecekan ketersediaan suatu stock itu adalah urusan internal dari barang 
+  // itu sendiri dan dengan meletakkanya di dalam class barang kita hanya perlu memanggil 
+  // method barang.bisaDijual(diminta) dari mana saja tanpa harus mengulang-ulang 
+  // logika pengecekan stock secara manual.
 
   // === DATA BARANG TRANSAKSI ===
   String namaBarang = "Sepatu Olahraga";

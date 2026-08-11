@@ -4,10 +4,40 @@ import 'package:intl/intl.dart';
 class Barang {
   String nama;
   double harga;
-  int stok;
+  int _stok; // Privat: hanya bisa diubah lewat method yang sah
 
   // Konstruktor
-  Barang(this.nama, this.harga, this.stok);
+  Barang(this.nama, this.harga, this._stok);
+
+  // === JAWABAN (Enkapsulasi) ===
+  // Bagaimana enkapsulasi mencegah stok diubah sembarangan?
+  // Dengan menjadikan _stok privat, tidak ada kode di luar kelas ini yang bisa langsung
+  // menulis atau mengubah nilainya (misal: barang._stok = 999 akan error).
+  // Satu-satunya cara mengubah stok adalah lewat method jual() yang sudah memiliki
+  // pengecekan kecukupan stok di dalamnya. Dengan cara ini, angka stok dijamin
+  // hanya berubah lewat proses penjualan yang sah dan terkendalikan.
+
+  // === JAWABAN: Mengapa melindungi _stok penting bagi integritas data koperasi? ===
+  // Karena stok adalah data keuangan nyata yang mewakili aset fisik barang di gudang.
+  // Jika _stok bisa diubah sembarangan dari mana saja, laporan total nilai stok akan kacau 
+  // dan tidak mencerminkan kondisi di kenyataan. Pengurus koperasi bisa saja malah salah  
+  // mengambil keputusan contoh: si pengurus membeli stok baru padahal di gudang sebenarnya  
+  // masih penuh. Dengan melindunginya, data stok hanya bisa berubah melalui transaksi jual 
+  // yang tercatat dan sah, sehingga data koperasi tetap akurat.
+
+  // Getter: agar kode luar bisa MEMBACA stok, tapi tidak bisa MENGUBAH langsung
+  int get stok => _stok;
+
+  // Method jual: mengurangi stok hanya bila mencukupi (enkapsulasi)
+  bool jual(int n) {
+    if (_stok >= n) {
+      _stok -= n;
+      return true; // Berhasil dijual
+    } else {
+      print("Stok $nama tidak mencukupi! (Sisa: $_stok, Diminta: $n)");
+      return false; // Gagal dijual
+    }
+  }
 
   // Method tampilkan
   void tampilkan() {
@@ -15,18 +45,18 @@ class Barang {
     print("-------------------------");
     print("Nama Barang : $nama");
     print("Harga       : Rp${formatRupiah.format(harga)}");
-    print("Stok        : $stok");
+    print("Stok        : $_stok");
     print("-------------------------");
   }
 
   // Method nilaiStok
   double nilaiStok() {
-    return harga * stok;
+    return harga * _stok;
   }
 
   // Method bisaDijual 
   bool bisaDijual(int diminta) {
-    return stok >= diminta;
+    return _stok >= diminta;
   }
 }
 
@@ -43,6 +73,19 @@ class Pembeli {
 // barang adalah One-to-Many. Alasannya: satu orang pembeli bisa saja membeli Banyak Barang 
 // yang berbeda-beda dalam satu struk pembelanjaan sekaligus. Namun, semua kumpulan barang 
 // yang ada di dalam struk tersebut hanya milik dari satu pembeli itu saja.
+
+class BarangPromo extends Barang {
+  double diskon; 
+
+  
+  BarangPromo(String nama, double harga, int stok, this.diskon)
+      : super(nama, harga, stok);
+
+  
+  double hargaPromo() {
+    return harga - (harga * diskon / 100);
+  }
+}
 
 double hitungTotal(int jumlah, double harga) {
   return jumlah * harga;
@@ -75,6 +118,24 @@ void main() {
     Barang("Roti", 5000.0, 3),
     Barang("Penghapus", 1500.0, 15),
   ];
+
+  // === DEMO BARANG PROMO ===
+  BarangPromo barangPromo = BarangPromo("Susu Ultra", 8000.0, 50, 20);
+  final formatRupiah2 = NumberFormat('#,##0', 'id_ID');
+  print("=== BARANG PROMO ===");
+  barangPromo.tampilkan();
+  print("Diskon       : ${barangPromo.diskon.toInt()}%");
+  print("Harga Promo  : Rp${formatRupiah2.format(barangPromo.hargaPromo())}");
+  print("========================\n");
+
+  // === ENKAPSULASI ===
+  print("=== UJI ENKAPSULASI ===");
+  Barang bukuTulis = Barang("Buku Tulis", 3000.0, 5);
+  print("Stok awal: ${bukuTulis.stok}");
+  bukuTulis.jual(3); // Berhasil, stok cukup
+  print("Setelah jual 3 → Sisa stok: ${bukuTulis.stok}");
+  bukuTulis.jual(5); // Gagal, stok tidak cukup
+  print("=====================================\n");
 
   // === DAFTAR BARANG ===
   print("=== DAFTAR BARANG ===");

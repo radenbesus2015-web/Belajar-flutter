@@ -1,92 +1,7 @@
 
 import 'package:intl/intl.dart';
 
-class Barang {
-  String nama;
-  double harga;
-  int _stok; // Privat: hanya bisa diubah lewat method yang sah
-
-  // Konstruktor
-  Barang(this.nama, this.harga, this._stok);
-
-  // === JAWABAN (Enkapsulasi) ===
-  // Bagaimana enkapsulasi mencegah stok diubah sembarangan?
-  // Dengan menjadikan _stok privat, tidak ada kode di luar kelas ini yang bisa langsung
-  // menulis atau mengubah nilainya (misal: barang._stok = 999 akan error).
-  // Satu-satunya cara mengubah stok adalah lewat method jual() yang sudah memiliki
-  // pengecekan kecukupan stok di dalamnya. Dengan cara ini, angka stok dijamin
-  // hanya berubah lewat proses penjualan yang sah dan terkendalikan.
-
-  // === JAWABAN: Mengapa melindungi _stok penting bagi integritas data koperasi? ===
-  // Karena stok adalah data keuangan nyata yang mewakili aset fisik barang di gudang.
-  // Jika _stok bisa diubah sembarangan dari mana saja, laporan total nilai stok akan kacau 
-  // dan tidak mencerminkan kondisi di kenyataan. Pengurus koperasi bisa saja malah salah  
-  // mengambil keputusan contoh: si pengurus membeli stok baru padahal di gudang sebenarnya  
-  // masih penuh. Dengan melindunginya, data stok hanya bisa berubah melalui transaksi jual 
-  // yang tercatat dan sah, sehingga data koperasi tetap akurat.
-
-  // Getter: agar kode luar bisa MEMBACA stok, tapi tidak bisa MENGUBAH langsung
-  int get stok => _stok;
-
-  // Method jual: mengurangi stok hanya bila mencukupi (enkapsulasi)
-  bool jual(int n) {
-    if (_stok >= n) {
-      _stok -= n;
-      return true; // Berhasil dijual
-    } else {
-      print("Stok $nama tidak mencukupi! (Sisa: $_stok, Diminta: $n)");
-      return false; // Gagal dijual
-    }
-  }
-
-  // Method tampilkan
-  void tampilkan() {
-    final formatRupiah = NumberFormat('#,##0', 'id_ID');
-    print("-------------------------");
-    print("Nama Barang : $nama");
-    print("Harga       : Rp${formatRupiah.format(harga)}");
-    print("Stok        : $_stok");
-    print("-------------------------");
-  }
-
-  // Method nilaiStok
-  double nilaiStok() {
-    return harga * _stok;
-  }
-
-  // Method bisaDijual 
-  bool bisaDijual(int diminta) {
-    return _stok >= diminta;
-  }
-}
-
-class Pembeli {
-  String nama;
-  bool statusAnggota; 
-
-  Pembeli(this.nama, this.statusAnggota);
-}
-
-// === JAWABAN (Tantangan Level 3) ===
-// Relasi apa yang wajar antara Pembeli & Barang dalam satu transaksi?
-// Dalam sebuah skenario transaksi, relasi yang paling sering kita temui antara pembeli dan 
-// barang adalah One-to-Many. Alasannya: satu orang pembeli bisa saja membeli Banyak Barang 
-// yang berbeda-beda dalam satu struk pembelanjaan sekaligus. Namun, semua kumpulan barang 
-// yang ada di dalam struk tersebut hanya milik dari satu pembeli itu saja.
-
-class BarangPromo extends Barang {
-  double diskon; 
-
-  
-  BarangPromo(String nama, double harga, int stok, this.diskon)
-      : super(nama, harga, stok);
-
-  
-  double hargaPromo() {
-    return harga - (harga * diskon / 100);
-  }
-}
-
+import 'barang.dart';
 double hitungTotal(int jumlah, double harga) {
   return jumlah * harga;
 }
@@ -109,7 +24,27 @@ double bayarAkhir(int jumlah, double harga, double persenPotongan) {
   return hitungHargaAkhir(total, persenPotongan);
 }
 
+
+void prosesBeli(Barang barang, String inputJumlah) {
+  try {
+    // angka
+    int jumlah = int.parse(inputJumlah);
+    // proses penjualan
+    bool berhasil = barang.jual(jumlah);
+    if (berhasil) {
+      print("✓ Transaksi berhasil! Terjual $jumlah ${barang.nama}. Sisa stok: ${barang.stok}");
+    }
+  } catch (e) {
+    // Jika input bukan angka, tampilkan pesan ramah
+    print("✗ Input tidak valid! Harap masukkan angka, bukan teks seperti '$inputJumlah'. Silakan coba lagi.");
+  } finally {
+    // Selalu dijalankan, baik berhasil maupun gagal
+    print("📋 Transaksi dicatat di log.\n");
+  }
+}
+
 void main() {
+
   final formatRupiah = NumberFormat('#,##0', 'id_ID');
   // Buat semua objek Barang sekaligus dalam List
   List<Barang> daftarBarang = [
@@ -121,22 +56,56 @@ void main() {
 
   // === DEMO BARANG PROMO ===
   BarangPromo barangPromo = BarangPromo("Susu Ultra", 8000.0, 50, 20);
-  final formatRupiah2 = NumberFormat('#,##0', 'id_ID');
-  print("=== BARANG PROMO ===");
   barangPromo.tampilkan();
-  print("Diskon       : ${barangPromo.diskon.toInt()}%");
-  print("Harga Promo  : Rp${formatRupiah2.format(barangPromo.hargaPromo())}");
-  print("========================\n");
+  print("");
 
   // === ENKAPSULASI ===
-  print("=== UJI ENKAPSULASI ===");
+  print("=== UJI ENKAPSULASI (SEBELUM DISERANG) ===");
   Barang bukuTulis = Barang("Buku Tulis", 3000.0, 5);
   print("Stok awal: ${bukuTulis.stok}");
   bukuTulis.jual(3); // Berhasil, stok cukup
   print("Setelah jual 3 → Sisa stok: ${bukuTulis.stok}");
   bukuTulis.jual(5); // Gagal, stok tidak cukup
-  print("=====================================\n");
+  print("");
+  
+  // === UJI SERANGAN ENKAPSULASI ===
+  print("--- Uji Serangan ---");
+  // bukuTulis._stok = 999; // ERROR! Sekarang ini ditolak oleh Dart karena beda file
+  print("Serangan diblokir! Kita tidak bisa lagi mengubah _stok secara langsung.\n");
 
+  print("=== UJI ENKAPSULASI (SETELAH DISERANG) ===");
+  print("Stok awal: ${bukuTulis.stok}");
+  bukuTulis.jual(3); // Berhasil, stok cukup
+  print("Setelah jual 3 → Sisa stok: ${bukuTulis.stok}");
+  bukuTulis.jual(5); // Tetap Gagal! Perlindungan berhasil
+  print("Setelah jual 5 → Sisa stok: ${bukuTulis.stok}");
+  print("==================================================\n");
+  
+  // === JAWABAN (Uji Serangan) ===
+  // Apa yang terjadi & apa artinya bagi keamanan data?
+  // Yang terjadi: Nilai stok BERHASIL diubah secara paksa menjadi 999.
+  // Artinya: Keamanan data (enkapsulasi) ternyata masih jebol! 
+  // Hal ini terjadi karena di bahasa Dart, variabel privat (_) hanya menyembunyikan 
+  // data dari FILE LAIN (library-level privacy), BUKAN dari dalam file yang sama. 
+  // Karena fungsi main() dan class Barang masih berada di satu file (main.dart) yang sama,
+  // main() masih bisa menembus perlindungan _stok. 
+  // Solusi sejati: class Barang harus dipisah ke file tersendiri (misal barang.dart) 
+  // agar _stok benar-benar kebal dari serangan fungsi di luar kelasnya.
+
+  // === DEMO prosesBeli (try-catch-finally) ===
+  Barang penghapus = Barang("Penghapus", 1500.0, 10);
+  print("=== DEMO PROSES BELI ===");
+  prosesBeli(penghapus, "3");    // Input valid
+  prosesBeli(penghapus, "dua"); // Input salah ketik (teks)
+  prosesBeli(penghapus, "99");  // Input valid tapi stok tidak cukup
+
+  // === JAWABAN Tabel G / Uji Ketahanan) ===
+  // Bagaimana penanganan galat meningkatkan kepercayaan pengurus pada sistem?
+  // Penanganan galat menggunakan try-catch membuat program menjadi lebih tangguh atau kuat.
+  // Ketika pengurus tidak sengaja memasukkan huruf "dua" saat diminta memasukkan angka, 
+  // sistem tidak akan berhenti mendadak (crash). Sebaliknya, sistem menangkap error tersebut,
+  // memberikan pesan peringatan yang ramah dan jelas, lalu tetap melanjutkan operasionalnya. 
+ 
   // === DAFTAR BARANG ===
   print("=== DAFTAR BARANG ===");
   for (Barang barang in daftarBarang) {

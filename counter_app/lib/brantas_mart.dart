@@ -137,3 +137,18 @@ Future<void> main() async {
   }
   print("===========================================");
 }
+
+/* 
+ * DOKUMENTASI: BAGAIMANA 5 KONSEP TP 12.2 BEKERJA SAMA
+ * 1. Tipe Data & Operator: Menyimpan data fundamental (harga ganda, status boolean) 
+ *    dan melakukan operasi matematika (hitung diskon, pembagian poin).
+ * 2. Kontrol Alur (Percabangan & Perulangan): Mengatur logika bisnis dengan `if-else` 
+ *    (apakah anggota/umum, dapat poin/tidak) dan `for` untuk mencetak daftar barang.
+ * 3. Fungsi: Memecah logika rumit menjadi bagian kecil yang dapat digunakan ulang 
+ *    sehingga `main()` menjadi rapi.
+ * 4. OOP : Menggabungkan data dan perilaku menjadi satu 
+ *    kesatuan objek (Barang), serta memanfaatkan pewarisan (BarangPromo) dan enkapsulasi.
+ * 5. Penanganan Galat & Asinkron: Mengamankan alur transaksi dari input yang salah 
+ *    lewat `try-catch`, serta memuat laporan akhir secara non-blocking dengan `async/await`.
+ * Kelima konsep ini bersatu menciptakan sistem kasir yang kokoh, modular, dan stabil.
+ */

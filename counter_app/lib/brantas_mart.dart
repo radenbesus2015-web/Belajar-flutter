@@ -1,4 +1,6 @@
 
+// Sistem Kasir Koperasi Sekolah — Brantas Mart
+// Integrasi Sprint 1 s.d. 7: OOP, Enkapsulasi, Pewarisan, try-catch, async/await
 import 'package:intl/intl.dart';
 import 'barang.dart';
 

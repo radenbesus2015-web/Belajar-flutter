@@ -27,23 +27,82 @@ double bayarAkhir(int jumlah, double harga, double persenPotongan) {
 
 void prosesBeli(Barang barang, String inputJumlah) {
   try {
-    // angka
+    // 1. Coba konversi input menjadi angka
     int jumlah = int.parse(inputJumlah);
-    // proses penjualan
+    
+    // 2. Cek apakah jumlah melebihi stok, jika ya lempar galat (Exception)
+    if (jumlah > barang.stok) {
+      throw RangeError("Jumlah beli melebihi sisa stok!");
+    }
+
+    // 3. Proses penjualan
     bool berhasil = barang.jual(jumlah);
     if (berhasil) {
       print("✓ Transaksi berhasil! Terjual $jumlah ${barang.nama}. Sisa stok: ${barang.stok}");
     }
+    
+  } on FormatException {
+    // Tangani galat 1: Input bukan angka
+    print("✗ Kesalahan Format: '$inputJumlah' bukan angka, ulangi.");
+  } on RangeError catch (e) {
+    // Tangani galat 2: Jumlah beli melebihi stok
+    print("✗ Kesalahan Stok: ${e.message}");
   } catch (e) {
-    // Jika input bukan angka, tampilkan pesan ramah
-    print("✗ Input tidak valid! Harap masukkan angka, bukan teks seperti '$inputJumlah'. Silakan coba lagi.");
+    // Tangani galat tak terduga lainnya
+    print("✗ Galat tak dikenal: $e");
   } finally {
     // Selalu dijalankan, baik berhasil maupun gagal
     print("📋 Transaksi dicatat di log.\n");
   }
 }
 
-void main() {
+// === JAWABAN (RPL-12.2-7S1 - HOTS-1) ===
+// Mengapa pesan spesifik menolong petugas?
+// Karena dengan adanya pesan yang spesifik kita petugas bisa tahu langsung apa 
+// yang salah tidak perlu menebak atau mencari apa yang salah dari ketikan mereka
+
+// === JAWABAN (RPL-12.2-7S2 - HOTS-2) ===
+// Bagaimana merancang respons berbeda?
+// Kita menggunakan "on FormatException" khusus untuk menangani galat ketikan (bukan angka), 
+// dan menggunakan "throw RangeError" dipadukan dengan "on RangeError catch" khusus 
+// untuk menangani jumlah stok yang kurang. Sehingga masing-masing galat akan 
+// memberikan pesan yang spesifik kepada pengguna.
+
+// === JAWABAN (RPL-12.2 - Tantangan Level 3) ===
+// Apakah semua bagian program perlu try-catch atau hanya yang berisiko?
+// Tidak, try-catch HANYA perlu digunakan pada bagian yang "berisiko" (seperti mengolah 
+// input pengguna, membaca database, atau akses internet). 
+// Berdasarkan prinsip efisiensi, alasannya adalah:
+// 1. Beban Kinerja (Overhead): Mekanisme try-catch memakan lebih banyak waktu proses dan memori. 
+//    Jika setiap baris kode sederhana dibungkus try-catch, aplikasi akan menjadi lambat.
+// 2. Keterbacaan (Readability): Menabur try-catch di seluruh bagian program akan membuat 
+//    kode menjadi panjang, kotor, dan sangat sulit dibaca (Spaghetti code).
+// 3. Efisiensi Alur Logika (Anti-Pattern): Secara desain, fungsi try-catch diciptakan 
+//    khusus untuk menangani kejadian "luar biasa" yang tidak terduga, BUKAN sebagai 
+//    pengganti if-else. Menjadikan try-catch sebagai alat pengecekan rutin sehari-hari 
+//    (exception-driven logic) adalah anti-pattern yang jauh lebih lambat dan memakan 
+//    waktu ketimbang sekadar menggunakan validasi kondisi "if" sederhana.
+
+// === JAWABAN (RPL-12.3 - Pemrograman Asinkron) ===
+// Mengapa operasi yang butuh waktu (memuat laporan) sebaiknya asinkron?
+// Operasi seperti memuat data (I/O, database, API) memakan waktu. Jika dilakukan secara 
+// sinkron, program akan "membeku" (block) selama menunggu, dan pengguna tidak bisa 
+// melakukan apa-apa. Dengan asinkron (async/await), program bisa tetap merespons 
+// (tetap jalan di latar belakang) sementara menunggu proses tersebut selesai.
+// 
+// Apa yang dirasakan pengguna bila program membeku tanpa pemberitahuan?
+// Pengguna akan merasa programnya rusak (crash atau hang), menjadi frustrasi, 
+// dan cenderung akan mematikan program secara paksa (force close) padahal 
+// program sebenarnya sedang bekerja lambat.
+
+Future<void> muatLaporan() async {
+  print("\n=== MEMUAT LAPORAN ===");
+  print("Menyiapkan laporan...");
+  await Future.delayed(Duration(seconds: 1)); // Simulasi jeda 1 detik
+  print("Laporan siap!");
+}
+
+Future<void> main() async {
 
   final formatRupiah = NumberFormat('#,##0', 'id_ID');
   // Buat semua objek Barang sekaligus dalam List
@@ -256,6 +315,9 @@ void main() {
     stokBuku--; // Terjual 1, stok berkurang
     print("Terjual 1, sisa stok: $stokBuku");
   }
+
+  // Memanggil fungsi asinkron di akhir hari
+  await muatLaporan();
 }
 
 // JAWABAN :

@@ -22,6 +22,14 @@ double hitungHargaAkhir(double total, double persenPotongan) {
   return total - (total * persenPotongan / 100);
 }
 
+int hitungPoin(bool anggota, double totalAkhir) {
+  // Aturan ke-5: Anggota dapat 1 poin tiap belanja Rp 10.000
+  if (anggota) {
+    return (totalAkhir ~/ 10000); // Pembagian bulat
+  }
+  return 0;
+}
+
 
 void prosesBeli(Barang barang, String inputJumlah) {
   try {
@@ -41,9 +49,14 @@ void prosesBeli(Barang barang, String inputJumlah) {
 }
 
 
-Future<void> muatLaporan(List<Barang> daftarBarang) async {
+Future<void> muatLaporan(List<Barang> daftarBarang, {bool simulasiGagal = false}) async {
   print("⏳ Menyiapkan laporan akhir hari...");
-  await Future.delayed(Duration(seconds: 1)); 
+  await Future.delayed(Duration(seconds: 1));
+
+  // Simulasi: kadang koneksi database bisa putus
+  if (simulasiGagal) {
+    throw Exception("Koneksi database terputus! Laporan tidak bisa dimuat.");
+  }
 
   double totalNilai = 0;
   for (Barang b in daftarBarang) {
@@ -52,7 +65,6 @@ Future<void> muatLaporan(List<Barang> daftarBarang) async {
   print("✅ Laporan siap!");
   print("   Total nilai stok koperasi: Rp${formatRupiah.format(totalNilai)}");
 }
-
 
 Future<void> main() async {
 
@@ -86,6 +98,7 @@ Future<void> main() async {
   double total        = jumlahBeli * hargaPilih;
   double persen       = hitungPotongan(isAnggota, total);
   double hargaAkhir   = hitungHargaAkhir(total, persen);
+  int    poinDapat    = hitungPoin(isAnggota, hargaAkhir);
 
   print("Pembeli  : ${isAnggota ? 'Anggota' : 'Umum'}");
   print("Barang   : ${itemBeli.nama}");
@@ -94,6 +107,9 @@ Future<void> main() async {
   print("Subtotal : Rp${formatRupiah.format(total)}");
   print("Diskon   : $persen%");
   print("TOTAL    : Rp${formatRupiah.format(hargaAkhir)}");
+  if (isAnggota) {
+    print("Poin     : +$poinDapat Poin");
+  }
 
   print("");
   prosesBeli(itemBeli, "$jumlahBeli");  
@@ -104,6 +120,20 @@ Future<void> main() async {
   print("\n===========================================");
   print("         LAPORAN AKHIR HARI                ");
   print("===========================================");
-  await muatLaporan(daftarBarang);
+  // Skenario 1: Laporan berhasil dimuat
+  try {
+    await muatLaporan(daftarBarang, simulasiGagal: false);
+  } catch (e) {
+    print("⚠️ Gagal memuat laporan: $e");
+    print("📋 Program tetap berjalan. Coba lagi nanti.");
+  }
+  print("");
+  // Skenario 2: Simulasi laporan gagal (database putus)
+  try {
+    await muatLaporan(daftarBarang, simulasiGagal: true);
+  } catch (e) {
+    print("⚠️ Gagal memuat laporan: $e");
+    print("📋 Program tetap berjalan. Coba lagi nanti.");
+  }
   print("===========================================");
 }
